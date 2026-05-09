@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MWIT#14 - Rātrī Sritrang 2026 — Ticket Sales Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #1e293b;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --muted: #94a3b8;
+      --line: #e2e8f0;
+      --brand: #2563eb;
+      --brand-soft: #dbeafe;
+      --accent: #f97316;
+      --good: #16a34a;
+      --warn: #d97706;
+      --bad: #dc2626;
+      --shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    .title-block .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    .title-block h1 {
+      margin: 6px 0 4px;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+    }
+
+    .title-block .sub {
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .as-of {
+      color: var(--ink-soft);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .as-of strong {
+      color: var(--ink);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 820px) {
+      .kpis {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 460px) {
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+    }
+
+    .kpi .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .kpi .value {
+      font-size: 30px;
+      font-weight: 700;
+      margin-top: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi .hint {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+
+    .kpi.brand .value {
+      color: var(--brand);
+    }
+
+    .kpi.accent .value {
+      color: var(--accent);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .card .helper {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-bottom: 14px;
+    }
+
+    .progress-wrap {
+      height: 22px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand) 0%, #60a5fa 100%);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 920px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 320px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      background: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    td.num,
+    th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pill.zero {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .pill.low {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .pill.good {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 30px;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="title-block">
+        <div class="eyebrow">MWIT#14 - Rātrī Sritrang 2026</div>
+        <h1 id="title">Ticket Sales Tracker</h1>
+        <div class="sub" id="sub">Live dashboard — refreshed daily.</div>
+        <div class="as-of">As of <strong id="as-of">—</strong></div>
+      </div>
+    </header>
+
+    <div id="err" class="error"></div>
+
+    <section class="kpis">
+      <div class="kpi">
+        <div class="label">Sales Target</div>
+        <div class="value" id="kpi-target">—</div>
+        <div class="hint">Tickets to sell in total</div>
+      </div>
+      <div class="kpi brand">
+        <div class="value" id="kpi-sold">—</div>
+        <div class="label">Tickets Sold</div>
+        <div class="hint" id="kpi-sold-hint">—</div>
+      </div>
+      <div class="kpi accent">
+        <div class="value" id="kpi-togo">—</div>
+        <div class="label">Tickets To Goal</div>
+        <div class="hint" id="kpi-togo-hint">—</div>
+      </div>
+      <div class="kpi">
+        <div class="value" id="kpi-progress">—</div>
+        <div class="label">Progress</div>
+        <div class="hint" id="kpi-progress-hint">—</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Progress to goal</h2>
+      <div class="helper" id="progress-helper">—</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="bar" style="width:0%"></div>
+      </div>
+      <div class="progress-meta">
+        <span>0</span>
+        <span id="progress-mid">—</span>
+        <span id="progress-end">—</span>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="card">
+        <h2>Tickets sold by room</h2>
+        <div class="helper">10 rooms · 24 members each</div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Room breakdown</h2>
+        <div class="helper">Members yet to buy a ticket</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th class="num">Members</th>
+              <th class="num">Sold</th>
+              <th class="num">Left</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    let chart;
+
+    async function load() {
+      const err = document.getElementById('err');
+      err.style.display = 'none';
+      try {
+        const res = await fetch('data.json?_=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load data.json (' + res.status + ')');
+        const d = await res.json();
+        render(d);
+      } catch (e) {
+        err.textContent = 'Could not load data.json — ' + e.message + '. If you opened the file directly (file://), serve the folder via a local web server or deploy it.';
+        err.style.display = 'block';
+      }
+    }
+
+    function render(d) {
+      document.getElementById('title').textContent = d.title || 'Ticket Sales Tracker';
+      document.getElementById('sub').textContent = 'Dashboard — refreshed daily.';
+      document.getElementById('as-of').textContent = d.as_of || '—';
+
+      const t = d.totals || {};
+      document.getElementById('kpi-target').textContent = (d.target ?? 0).toLocaleString();
+      document.getElementById('kpi-sold').textContent = (t.sold ?? 0).toLocaleString();
+      document.getElementById('kpi-togo').textContent = (t.to_goal ?? 0).toLocaleString();
+      const pct = (t.progress ?? 0);
+      document.getElementById('kpi-progress').textContent = (pct * 100).toFixed(1) + '%';
+
+      document.getElementById('kpi-sold-hint').textContent =
+        'Across ' + (d.rooms?.length || 0) + ' rooms · ' + (t.members ?? 0) + ' members';
+      document.getElementById('kpi-togo-hint').textContent =
+        (t.left ?? 0) + ' members yet to buy';
+      document.getElementById('kpi-progress-hint').textContent =
+        pct < 0.5 ? 'Behind target — push harder' :
+          pct < 1 ? 'On track — keep going' : 'Goal reached';
+
+      // Progress bar
+      const widthPct = Math.min(100, Math.max(0, pct * 100));
+      const bar = document.getElementById('bar');
+      bar.style.width = widthPct + '%';
+      if (pct >= 1) bar.style.background = 'linear-gradient(90deg, #16a34a, #22c55e)';
+      else if (pct >= 0.5) bar.style.background = 'linear-gradient(90deg, #2563eb, #60a5fa)';
+      else bar.style.background = 'linear-gradient(90deg, #f97316, #fbbf24)';
+
+      document.getElementById('progress-helper').textContent =
+        (t.sold ?? 0) + ' of ' + (d.target ?? 0) + ' sold · ' + (t.to_goal ?? 0) + ' to go';
+      document.getElementById('progress-mid').textContent = Math.floor((d.target || 0) / 2);
+      document.getElementById('progress-end').textContent = (d.target ?? 0);
+
+      // Chart
+      const labels = (d.rooms || []).map(r => 'Room ' + r.room);
+      const sold = (d.rooms || []).map(r => r.sold);
+      const left = (d.rooms || []).map(r => r.left);
+      const ctx = document.getElementById('chart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Sold',
+              data: sold,
+              backgroundColor: '#2563eb',
+              borderRadius: 6,
+            },
+            {
+              label: 'Left to sell',
+              data: left,
+              backgroundColor: '#e2e8f0',
+              borderRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, ticks: { stepSize: 4 } }
+          },
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: { mode: 'index', intersect: false }
+          }
+        }
+      });
+
+      // Table
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = (d.rooms || []).map(r => {
+        let pillClass = 'zero', pillText = 'Not started';
+        if (r.sold > 0 && r.sold < r.members * 0.25) { pillClass = 'low'; pillText = 'Just started'; }
+        else if (r.sold >= r.members * 0.25 && r.sold < r.members * 0.5) { pillClass = 'low'; pillText = 'Building'; }
+        else if (r.sold >= r.members * 0.5) { pillClass = 'good'; pillText = 'Strong'; }
+        return `<tr>
+      <td>Room ${r.room}</td>
+      <td class="num">${r.members}</td>
+      <td class="num"><strong>${r.sold}</strong></td>
+      <td class="num">${r.left}</td>
+      <td><span class="pill ${pillClass}">${pillText}</span></td>
+    </tr>`;
+      }).join('');
+    }
+
+    load();
+  </script>
+</body>
+
+</html>

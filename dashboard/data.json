@@ -1,0 +1,76 @@
+{
+  "title": "TICKET SALES TRACKER",
+  "event": "MWIT#14 - Rātrī Sritrang 2026",
+  "as_of": "2026-05-09",
+  "generated_at": "2026-05-09 23:11",
+  "target": 100,
+  "totals": {
+    "members": 240,
+    "sold": 50,
+    "left": 190,
+    "to_goal": 50,
+    "progress": 0.5
+  },
+  "rooms": [
+    {
+      "room": 1,
+      "members": 24,
+      "sold": 4,
+      "left": 20
+    },
+    {
+      "room": 2,
+      "members": 24,
+      "sold": 7,
+      "left": 17
+    },
+    {
+      "room": 3,
+      "members": 24,
+      "sold": 7,
+      "left": 17
+    },
+    {
+      "room": 4,
+      "members": 24,
+      "sold": 6,
+      "left": 18
+    },
+    {
+      "room": 5,
+      "members": 24,
+      "sold": 2,
+      "left": 22
+    },
+    {
+      "room": 6,
+      "members": 24,
+      "sold": 6,
+      "left": 18
+    },
+    {
+      "room": 7,
+      "members": 24,
+      "sold": 3,
+      "left": 21
+    },
+    {
+      "room": 8,
+      "members": 24,
+      "sold": 4,
+      "left": 20
+    },
+    {
+      "room": 9,
+      "members": 24,
+      "sold": 4,
+      "left": 20
+    },
+    {
+      "room": 10,
+      "members": 24,
+      "sold": 7,
+      "left": 17
+    }
+  ]
+}
